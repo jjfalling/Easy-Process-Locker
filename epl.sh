@@ -59,18 +59,16 @@ fullcommand=`echo $1 | awk -F" " '{print $1}'`
 command=`echo $fullcommand | rev | cut -d/ -f1 | rev`
 arguments=`echo ${1#${fullcommand}}`
 
-
-#now generate a unique name based on the command and arguments (alpha-numeric chars only, plus _ - = . ) as to prevent some nasty things
+#now generate a unique name based on the command and arguments (alpha-numeric plus _ - = . only) as to prevent some nasty things
 uniqueName=`echo "$command _ $arguments" | sed 's/[^a-zA-Z0-9_.=-]//g'`
 
 
 if [ -f "/tmp/$uniqueName.lock" ];then
 
 	#the lock file already exists, so check to see if the pid is valid
-
 	if [ "$(ps -p `cat /tmp/$uniqueName.lock` | wc -l)" -gt 1 ];then
 
-		#the another backup is running, send an alert and bail!
+		#the another instance of the requested job is running, throw error
 		echo "$0: ERROR the backup script is already running and I cannot run another copy! lingering process `cat /tmp/$uniqueName.lock`"
 		exit 1
 

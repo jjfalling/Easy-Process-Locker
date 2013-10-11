@@ -74,8 +74,7 @@ if [ -f "/tmp/$uniqueName.lock" ];then
 
 	else
 
-		#process not running, but lock file not deleted? lets log it, delete the lock, and continue
-		#remove old log and create new one.
+		#process not running, but lock file not deleted? print an message, delete the lock, and continue
 		echo " $0: orphan lock file warning. Lock file deleted."
 		rm -f "/tmp/$uniqueName.lock"
 		if [ "$?" -ne 0 ]; then

@@ -10,6 +10,6 @@ It will clean up orphaned lock files and prevent execution of jobs that are alre
 Lockfiles are generated as /tmp/(command.ext)_(arguments) with only alpha-numeric characters, plus _-.= 
 This way jobs that use the same command but different flags can run at the same time. 
 
-Usage: epl 'command you want to run with arguments'
+Usage: epl.sh 'command you want to run with arguments'
 
-Example: epl '/usr/bin/who -a'
+Example: epl.sh '/usr/bin/who -a'

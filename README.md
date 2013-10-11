@@ -7,6 +7,9 @@ Run this with your the script and arguments you want to run in quotes and it wil
 It will clean up orphaned lock files and prevent execution of jobs that are already running. 
 
 
+Lockfiles are generated as /tmp/(command.ext)_(arguments) with only alpha-numeric characters, plus _-.= 
+This way jobs that use the same command but different flags can run at the same time. 
+
 Usage: epl 'command you want to run with arguments'
 
 Example: epl '/usr/bin/who -a'

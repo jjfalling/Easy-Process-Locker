@@ -1,4 +1,4 @@
-Easy Process Lock
+Easy Process Locker
 =========
 
 An easy way to add a lock to any script

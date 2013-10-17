@@ -2,7 +2,7 @@
 PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:$PATH
 
 #****************************************************************************
-#*   Easy Process Lock (epl)                                                *
+#*   Easy Process Locker (epl)                                              *
 #*   Easily create and manage a lockfile for any script or program          *
 #*                                                                          *
 #*   Copyright (C) 2013 by Jeremy Falling except where noted.               *

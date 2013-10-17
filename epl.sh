@@ -20,44 +20,69 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:$PATH
 #*   You should have received a copy of the GNU General Public License      *
 #*   along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
 #****************************************************************************
+OPT_C=""
+OPT_E=0
 
 
-#check for help flags
-if [ "$1" == "--help" ] || [ "$1" == "-h" ] || [ "$1" == "?" ] || [ "$1" == "--h" ]|| [ "$1" == "-help" ]; then
-	echo ""
-	echo "Usage: $0 'command you want to run with arguments'"
-	echo "Example: $0 /usr/bin/who -a"
-	echo ""
-	exit 0
-	
-fi
+usage()
+{
+cat << EOF
 
-#if there is no $1 or if > 1 args, throw error
-if [ -z "$1" ]; then
+Usage: $0  [-e] -c 'command you want to run with arguments'
+Example: $0 -e -c '/usr/bin/who -a'
+
+options:
+
+    -e	exit when there is an orphaned pid found
+    -c  command to run (required)
+    -h	display this message
+
+EOF
+ 
+}
+
+while getopts ":ec:" FLAG
+do
+	case $FLAG in
+        c)
+            OPT_C=${OPTARG}
+            ;;
+        e)
+            OPT_E=1
+            ;;
+        *  )
+        	usage 
+        	exit 1
+        	;;
+    esac
+done
+
+
+
+##if there is no $1 or if > 1 args, throw error
+if [ "$OPT_C" == "" ]; then
 	echo ""
-	echo "ERROR: You must supply one argument in quotes with the command to run!"
+	echo "ERROR: You must supply -c with the command(s) to run in quotes!"
 	echo ""
-	echo "Usage: $0 'command you want to run with arguments'"
-	echo "Example: $0 /usr/bin/who -a"
-	echo ""
+	usage
 	exit 1
 	
-elif [ "$#" -gt 1 ]; then
-	echo ""
-	echo "ERROR: You must only supply one argument and it must be in quotes!"
-	echo ""
-	echo "Usage: $0 'command you want to run with arguments'"
-	echo "Example: $0 '/usr/bin/who -a'"
-	echo ""
-	exit 1
-	
+#elif [ "$#" -gt 1 ]; then
+#	echo ""
+#	echo "ERROR: You must only supply one argument and it must be in quotes!"
+#	echo ""
+#	echo "Usage: $0 'command you want to run with arguments'"
+#	echo "Example: $0 '/usr/bin/who -a'"
+#	echo ""
+#	exit 1
+
 fi
 
 
 #get the full and short command names, and the arguments, 
-fullcommand=`echo $1 | awk -F" " '{print $1}'`
+fullcommand=`echo $OPT_C | awk -F" " '{print $1}'`
 command=`echo $fullcommand | rev | cut -d/ -f1 | rev`
-arguments=`echo ${1#${fullcommand}}`
+arguments=`echo ${OPT_C#${fullcommand}}`
 
 #now generate a unique name based on the command and arguments (alpha-numeric plus _ - = . only) as to prevent some nasty things
 uniqueName=`echo "$command _ $arguments" | sed 's/[^a-zA-Z0-9_.=-]//g'`
@@ -74,14 +99,24 @@ if [ -f "/tmp/$uniqueName.lock" ];then
 
 	else
 
-		#process not running, but lock file not deleted? print an message, delete the lock, and continue
-		echo " $0: orphan lock file warning. Lock file deleted."
-		rm -f "/tmp/$uniqueName.lock"
-		if [ "$?" -ne 0 ]; then
-		{
-			echo "ERROR: Could not remove orphaned lockfile /tmp/$uniqueName.lock"
+		#process not running, but lock file not deleted.
+		
+		#did user want us to exit on this condition? yes, exit
+		if [ "$OPT_E" -ne 0 ]; then
+			echo " $0: ERROR orphan lock was found! Exiting per flags given..."
 			exit 1
-		}
+
+		#no, print an message, delete the lock, and continue
+		else
+		
+			echo " $0: WARNING: orphan lock file has been deleted."
+			rm -f "/tmp/$uniqueName.lock"
+			if [ "$?" -ne 0 ]; then
+			{
+				echo "ERROR: Could not remove orphaned lockfile /tmp/$uniqueName.lock"
+				exit 1
+			}
+			fi
 		fi
 
 
@@ -99,8 +134,8 @@ if [ "$?" -ne 0 ]; then
 }
 fi
 
-#run the requested command here
-$1
+#run the requested command here. Using eval to allow ; and &&
+eval $OPT_C
 
 #remove the lock file
 rm "/tmp/$uniqueName.lock"

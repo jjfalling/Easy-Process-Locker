@@ -12,4 +12,4 @@ This way jobs that use the same command but different flags can run at the same 
 
 Usage: epl.sh 'command you want to run with arguments'
 
-Example: epl.sh '/usr/bin/who -a'
+Example: epl.sh -c '/usr/bin/who -a'

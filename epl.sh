@@ -94,7 +94,7 @@ if [ -f "/tmp/$uniqueName.lock" ];then
 	if [ "$(ps -p `cat /tmp/$uniqueName.lock` | wc -l)" -gt 1 ];then
 
 		#the another instance of the requested job is running, throw error
-		echo "$0: ERROR the backup script is already running and I cannot run another copy! lingering process `cat /tmp/$uniqueName.lock`"
+		echo "$0: ERROR the locked command is already running and I cannot run another copy! lingering process `cat /tmp/$uniqueName.lock`"
 		exit 1
 
 	else
